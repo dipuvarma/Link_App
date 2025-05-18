@@ -1,7 +1,6 @@
-package com.example.linkapp.presentation.features.registration
+package com.example.linkapp.presentation.features.login
 
-data class RegistrationState(
-    val name: String = "",
+data class LoginState(
     val email: String = "",
     val password: String = "",
     val repeatPassword: String = "",

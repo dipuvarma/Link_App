@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Password
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.RemoveRedEye
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
@@ -40,16 +41,20 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.linkapp.presentation.component.FormLabel
 import com.example.linkapp.ui.theme.LinkAppTheme
 
 @Composable
 fun RegistrationScreen(
     viewModel: RegistrationViewModel,
 ) {
+    val state by viewModel.registrationUiState.collectAsState()
 
-    val state = viewModel.registrationUiState.collectAsState()
-
-    val focusRequester = remember { FocusRequester() }
+    val nameFocusRequester = remember { FocusRequester() }
+    val emailFocusRequester = remember { FocusRequester() }
+    val passwordFocusRequester = remember { FocusRequester() }
+    val repeatPasswordFocusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
 
     Box(
         modifier = Modifier
@@ -63,6 +68,7 @@ fun RegistrationScreen(
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.Center
         ) {
+            // Header
             Text(
                 text = "Create account",
                 style = MaterialTheme.typography.headlineMedium.copy(
@@ -78,148 +84,145 @@ fun RegistrationScreen(
                 )
             )
             Spacer(modifier = Modifier.height(32.dp))
-            //Email
-            Text(
-                text = "Your email",
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    color = MaterialTheme.colorScheme.onBackground,
-                    fontWeight = FontWeight.SemiBold
-                )
-            )
+
+            //Name
+            FormLabel("Your Name")
             Spacer(modifier = Modifier.height(4.dp))
             OutlinedTextField(
-                value = state.value.email,
-                onValueChange = { viewModel.updateEmail(it) },
+                value = state.name,
+                onValueChange = viewModel::updateName,
                 modifier = Modifier
-                    .fillMaxWidth(),
-                placeholder = { Text(text = "Enter Your Email") },
+                    .fillMaxWidth()
+                    .focusRequester(nameFocusRequester),
+                placeholder = { Text("Enter Your Name") },
                 leadingIcon = {
-                    Icon(imageVector = Icons.Default.Email, contentDescription = "")
+                    Icon(Icons.Default.Person, contentDescription = "Person icon")
+                },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Next
+                ),
+                keyboardActions = KeyboardActions(
+                    onNext = { emailFocusRequester.requestFocus() }
+                )
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            // Email
+            FormLabel("Your email")
+            Spacer(modifier = Modifier.height(4.dp))
+            OutlinedTextField(
+                value = state.email,
+                onValueChange = viewModel::updateEmail,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(emailFocusRequester),
+                placeholder = { Text("Enter Your Email") },
+                leadingIcon = {
+                    Icon(Icons.Default.Email, contentDescription = "Email icon")
                 },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Email,
                     imeAction = ImeAction.Next
                 ),
+                keyboardActions = KeyboardActions(
+                    onNext = { passwordFocusRequester.requestFocus() }
+                )
             )
             Spacer(modifier = Modifier.height(16.dp))
 
-            //PassWord
-            Text(
-                text = "Password",
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    color = MaterialTheme.colorScheme.onBackground,
-                    fontWeight = FontWeight.SemiBold
-                )
-            )
+            // Password
+            FormLabel("Password")
             Spacer(modifier = Modifier.height(4.dp))
             OutlinedTextField(
-                value = state.value.password,
-                onValueChange = { viewModel.updatePassword(it) },
+                value = state.password,
+                onValueChange = viewModel::updatePassword,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .focusRequester(focusRequester),
-                placeholder = { Text(text = "Enter Your Password") },
+                    .focusRequester(passwordFocusRequester),
+                placeholder = { Text("Enter Your Password") },
                 leadingIcon = {
-                    Icon(Icons.Default.Lock, contentDescription = "")
+                    Icon(Icons.Default.Lock, contentDescription = "Password icon")
                 },
                 trailingIcon = {
-                    if (state.value.password.isNotEmpty()) {
-                        IconButton(
-                            onClick = {
-                                viewModel.isHidePassword()
-                            }
-                        ) {
+                    if (state.password.isNotEmpty()) {
+                        IconButton(onClick = viewModel::togglePasswordVisibility) {
                             Icon(
-                                imageVector = if (state.value.isHidePassword) Icons.Default.VisibilityOff else Icons.Default.RemoveRedEye,
-                                contentDescription = "email"
+                                imageVector = if (state.isHidePassword)
+                                    Icons.Default.VisibilityOff
+                                else
+                                    Icons.Default.RemoveRedEye,
+                                contentDescription = "Toggle password visibility"
                             )
                         }
                     }
                 },
-                visualTransformation = if (state.value.isHidePassword) {
-                    PasswordVisualTransformation()
-                } else {
-                    VisualTransformation.None
-                },
-
+                visualTransformation = if (state.isHidePassword) PasswordVisualTransformation() else VisualTransformation.None,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password,
                     imeAction = ImeAction.Next
                 ),
+                keyboardActions = KeyboardActions(
+                    onNext = { repeatPasswordFocusRequester.requestFocus() }
+                )
             )
             Spacer(modifier = Modifier.height(16.dp))
 
-
-            //Repeat Password
-            Text(
-                text = "Repeat Password",
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    color = MaterialTheme.colorScheme.onBackground,
-                    fontWeight = FontWeight.SemiBold
-                )
-            )
+            // Repeat Password
+            FormLabel("Repeat Password")
             Spacer(modifier = Modifier.height(4.dp))
             OutlinedTextField(
-                value = state.value.repeatPassword,
-                onValueChange = { viewModel.repeatPassword(it) },
+                value = state.repeatPassword,
+                onValueChange = viewModel::repeatPassword,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .focusRequester(focusRequester),
-                placeholder = { Text(text = "Repeat Password") },
+                    .focusRequester(repeatPasswordFocusRequester),
+                placeholder = { Text("Repeat Password") },
                 leadingIcon = {
-                    Icon(Icons.Default.Password, contentDescription = "")
+                    Icon(Icons.Default.Password, contentDescription = "Repeat password icon")
                 },
                 trailingIcon = {
-                    if (state.value.repeatPassword.isNotEmpty()) {
-                        IconButton(
-                            onClick = { viewModel.isHideRepeatPassword() }
-                        ) {
+                    if (state.repeatPassword.isNotEmpty()) {
+                        IconButton(onClick = viewModel::toggleRepeatPasswordVisibility) {
                             Icon(
-                                imageVector = if (state.value.isHideRepeatPassword) Icons.Default.VisibilityOff else Icons.Default.RemoveRedEye,
-                                contentDescription = "email"
+                                imageVector = if (state.isHideRepeatPassword)
+                                    Icons.Default.VisibilityOff
+                                else
+                                    Icons.Default.RemoveRedEye,
+                                contentDescription = "Toggle repeat password visibility"
                             )
                         }
                     }
                 },
-
-                visualTransformation = if (state.value.isHideRepeatPassword) {
-                    PasswordVisualTransformation()
-                } else {
-                    VisualTransformation.None
-                },
-
+                visualTransformation = if (state.isHideRepeatPassword) PasswordVisualTransformation() else VisualTransformation.None,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password,
                     imeAction = ImeAction.Done
                 ),
                 keyboardActions = KeyboardActions(
-                    onDone = {
-                        focusRequester.freeFocus()
-                    }
+                    onDone = { focusManager.clearFocus() }
                 )
             )
             Spacer(modifier = Modifier.height(32.dp))
 
-            //Register Button
+            // Register Button
             Button(
-                onClick = {},
+                onClick = { /* Add action */ },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp),
                 shape = RoundedCornerShape(4.dp),
-                colors = ButtonColors(
-                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
-                    disabledContentColor = MaterialTheme.colorScheme.onPrimary,
-                    disabledContainerColor = MaterialTheme.colorScheme.primary
+                    contentColor = MaterialTheme.colorScheme.onPrimary
                 ),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp)
             ) {
-                Text(text = "Register")
+                Text("Register")
             }
+
             Spacer(modifier = Modifier.height(32.dp))
 
-            //Login Button
+            // Login Prompt
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
@@ -234,16 +237,14 @@ fun RegistrationScreen(
             }
             Spacer(modifier = Modifier.height(8.dp))
             Button(
-                onClick = {},
+                onClick = { /* Navigate to Login */ },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp),
                 shape = RoundedCornerShape(4.dp),
-                colors = ButtonColors(
-                    contentColor = MaterialTheme.colorScheme.primary,
+                colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary.copy(alpha = .2f),
-                    disabledContentColor = MaterialTheme.colorScheme.onSurface,
-                    disabledContainerColor = MaterialTheme.colorScheme.surface
+                    contentColor = MaterialTheme.colorScheme.primary
                 )
             ) {
                 Text("Login")
@@ -251,6 +252,7 @@ fun RegistrationScreen(
         }
     }
 }
+
 
 //@Preview(showSystemUi = true)
 //@Composable
