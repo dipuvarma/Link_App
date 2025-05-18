@@ -21,7 +21,6 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.RemoveRedEye
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -39,21 +38,22 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.linkapp.presentation.component.FormLabel
-import com.example.linkapp.ui.theme.LinkAppTheme
+import com.example.linkapp.presentation.navigation.Home
+import com.example.linkapp.presentation.navigation.Login
 
 @Composable
 fun RegistrationScreen(
     viewModel: RegistrationViewModel,
+    navController: NavHostController,
 ) {
     val state by viewModel.registrationUiState.collectAsState()
 
     val nameFocusRequester = remember { FocusRequester() }
     val emailFocusRequester = remember { FocusRequester() }
     val passwordFocusRequester = remember { FocusRequester() }
-    val repeatPasswordFocusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
 
     Box(
@@ -159,54 +159,20 @@ fun RegistrationScreen(
                 visualTransformation = if (state.isHidePassword) PasswordVisualTransformation() else VisualTransformation.None,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password,
-                    imeAction = ImeAction.Next
-                ),
-                keyboardActions = KeyboardActions(
-                    onNext = { repeatPasswordFocusRequester.requestFocus() }
-                )
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Repeat Password
-            FormLabel("Repeat Password")
-            Spacer(modifier = Modifier.height(4.dp))
-            OutlinedTextField(
-                value = state.repeatPassword,
-                onValueChange = viewModel::repeatPassword,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .focusRequester(repeatPasswordFocusRequester),
-                placeholder = { Text("Repeat Password") },
-                leadingIcon = {
-                    Icon(Icons.Default.Password, contentDescription = "Repeat password icon")
-                },
-                trailingIcon = {
-                    if (state.repeatPassword.isNotEmpty()) {
-                        IconButton(onClick = viewModel::toggleRepeatPasswordVisibility) {
-                            Icon(
-                                imageVector = if (state.isHideRepeatPassword)
-                                    Icons.Default.VisibilityOff
-                                else
-                                    Icons.Default.RemoveRedEye,
-                                contentDescription = "Toggle repeat password visibility"
-                            )
-                        }
-                    }
-                },
-                visualTransformation = if (state.isHideRepeatPassword) PasswordVisualTransformation() else VisualTransformation.None,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password,
                     imeAction = ImeAction.Done
                 ),
                 keyboardActions = KeyboardActions(
                     onDone = { focusManager.clearFocus() }
                 )
             )
+
             Spacer(modifier = Modifier.height(32.dp))
 
             // Register Button
             Button(
-                onClick = { /* Add action */ },
+                onClick = {
+                    navController.navigate(Home)
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp),
@@ -237,7 +203,9 @@ fun RegistrationScreen(
             }
             Spacer(modifier = Modifier.height(8.dp))
             Button(
-                onClick = { /* Navigate to Login */ },
+                onClick = {
+                    navController.navigate(Login)
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp),

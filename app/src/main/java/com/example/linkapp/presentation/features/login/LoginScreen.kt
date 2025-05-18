@@ -41,13 +41,17 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.linkapp.presentation.component.FormLabel
-import com.example.linkapp.presentation.features.registration.RegistrationViewModel
+import com.example.linkapp.presentation.features.home.HomeScreen
+import com.example.linkapp.presentation.navigation.Home
+import com.example.linkapp.presentation.navigation.Registration
 
 
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel,
+    navController: NavHostController,
 ) {
     val state by viewModel.loginUiState.collectAsState()
 
@@ -184,7 +188,9 @@ fun LoginScreen(
 
             // Register Button
             Button(
-                onClick = { /* Add action */ },
+                onClick = {
+                    navController.navigate(Home)
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp),
@@ -215,7 +221,9 @@ fun LoginScreen(
             }
             Spacer(modifier = Modifier.height(8.dp))
             Button(
-                onClick = { /* Navigate to Login */ },
+                onClick = {
+                    navController.navigate(Registration)
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp),

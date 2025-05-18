@@ -25,19 +25,8 @@ class RegistrationViewModel : ViewModel() {
             password = password
         )
     }
-
-    fun repeatPassword(repeatPassword: String) {
-        _registrationUiState.value = registrationUiState.value.copy(
-            repeatPassword = repeatPassword
-        )
-    }
-
     fun togglePasswordVisibility() {
         _registrationUiState.update { it.copy(isHidePassword = !it.isHidePassword) }
-    }
-
-    fun toggleRepeatPasswordVisibility() {
-        _registrationUiState.update { it.copy(isHideRepeatPassword = !it.isHideRepeatPassword) }
     }
 
 

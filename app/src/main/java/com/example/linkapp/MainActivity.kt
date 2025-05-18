@@ -11,19 +11,25 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
+import com.example.linkapp.presentation.features.login.LoginViewModel
 import com.example.linkapp.presentation.features.registration.RegistrationScreen
 import com.example.linkapp.presentation.features.registration.RegistrationViewModel
+import com.example.linkapp.presentation.navigation.LinkAppGraph
 import com.example.linkapp.ui.theme.LinkAppTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         val viewModel: RegistrationViewModel by viewModels()
+        val loginViewModel: LoginViewModel by viewModels()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             LinkAppTheme(darkTheme = false, dynamicColor = false) {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    RegistrationScreen(viewModel)
+                    LinkAppGraph(
+                        loginViewModel = loginViewModel,
+                        viewModel
+                    )
                 }
             }
         }

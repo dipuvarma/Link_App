@@ -4,7 +4,5 @@ data class RegistrationState(
     val name: String = "",
     val email: String = "",
     val password: String = "",
-    val repeatPassword: String = "",
     val isHidePassword: Boolean = false,
-    val isHideRepeatPassword: Boolean = false,
 )
