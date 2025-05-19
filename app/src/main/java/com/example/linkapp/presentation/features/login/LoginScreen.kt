@@ -53,7 +53,9 @@ fun LoginScreen(
     viewModel: LoginViewModel,
     navController: NavHostController,
 ) {
-    val state by viewModel.loginUiState.collectAsState()
+    val stateUi by viewModel.loginUiState.collectAsState()
+
+    val state = stateUi.userDetailsUi
 
     val emailFocusRequester = remember { FocusRequester() }
     val passwordFocusRequester = remember { FocusRequester() }
@@ -129,7 +131,7 @@ fun LoginScreen(
                     if (state.password.isNotEmpty()) {
                         IconButton(onClick = viewModel::togglePasswordVisibility) {
                             Icon(
-                                imageVector = if (state.isHidePassword)
+                                imageVector = if (stateUi.isHidePassword)
                                     Icons.Default.VisibilityOff
                                 else
                                     Icons.Default.RemoveRedEye,
@@ -138,7 +140,7 @@ fun LoginScreen(
                         }
                     }
                 },
-                visualTransformation = if (state.isHidePassword) PasswordVisualTransformation() else VisualTransformation.None,
+                visualTransformation = if (stateUi.isHidePassword) PasswordVisualTransformation() else VisualTransformation.None,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password,
                     imeAction = ImeAction.Next
@@ -153,7 +155,7 @@ fun LoginScreen(
             FormLabel("Repeat Password")
             Spacer(modifier = Modifier.height(4.dp))
             OutlinedTextField(
-                value = state.repeatPassword,
+                value = stateUi.repeatPassword,
                 onValueChange = viewModel::repeatPassword,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -163,10 +165,10 @@ fun LoginScreen(
                     Icon(Icons.Default.Password, contentDescription = "Repeat password icon")
                 },
                 trailingIcon = {
-                    if (state.repeatPassword.isNotEmpty()) {
+                    if (stateUi.repeatPassword.isNotEmpty()) {
                         IconButton(onClick = viewModel::toggleRepeatPasswordVisibility) {
                             Icon(
-                                imageVector = if (state.isHideRepeatPassword)
+                                imageVector = if (stateUi.isHideRepeatPassword)
                                     Icons.Default.VisibilityOff
                                 else
                                     Icons.Default.RemoveRedEye,
@@ -175,7 +177,7 @@ fun LoginScreen(
                         }
                     }
                 },
-                visualTransformation = if (state.isHideRepeatPassword) PasswordVisualTransformation() else VisualTransformation.None,
+                visualTransformation = if (stateUi.isHideRepeatPassword) PasswordVisualTransformation() else VisualTransformation.None,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password,
                     imeAction = ImeAction.Done

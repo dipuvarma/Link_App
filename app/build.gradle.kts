@@ -5,6 +5,7 @@ plugins {
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
     kotlin("plugin.serialization") version "2.1.20"
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -76,4 +77,8 @@ dependencies {
 
     /* For Google Fonts */
     implementation(libs.androidx.ui.text.google.fonts)
+
+    //firebase
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.database)
 }

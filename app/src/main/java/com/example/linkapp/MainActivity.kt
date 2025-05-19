@@ -16,20 +16,17 @@ import com.example.linkapp.presentation.features.registration.RegistrationScreen
 import com.example.linkapp.presentation.features.registration.RegistrationViewModel
 import com.example.linkapp.presentation.navigation.LinkAppGraph
 import com.example.linkapp.ui.theme.LinkAppTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        val viewModel: RegistrationViewModel by viewModels()
-        val loginViewModel: LoginViewModel by viewModels()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             LinkAppTheme(darkTheme = false, dynamicColor = false) {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    LinkAppGraph(
-                        loginViewModel = loginViewModel,
-                        viewModel
-                    )
+                    LinkAppGraph()
                 }
             }
         }

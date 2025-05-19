@@ -49,7 +49,9 @@ fun RegistrationScreen(
     viewModel: RegistrationViewModel,
     navController: NavHostController,
 ) {
-    val state by viewModel.registrationUiState.collectAsState()
+    val stateUi by viewModel.registrationUiState.collectAsState()
+
+    val state = stateUi.userDetailsUi
 
     val nameFocusRequester = remember { FocusRequester() }
     val emailFocusRequester = remember { FocusRequester() }
@@ -147,7 +149,7 @@ fun RegistrationScreen(
                     if (state.password.isNotEmpty()) {
                         IconButton(onClick = viewModel::togglePasswordVisibility) {
                             Icon(
-                                imageVector = if (state.isHidePassword)
+                                imageVector = if (stateUi.isHidePassword)
                                     Icons.Default.VisibilityOff
                                 else
                                     Icons.Default.RemoveRedEye,
@@ -156,7 +158,7 @@ fun RegistrationScreen(
                         }
                     }
                 },
-                visualTransformation = if (state.isHidePassword) PasswordVisualTransformation() else VisualTransformation.None,
+                visualTransformation = if (stateUi.isHidePassword) PasswordVisualTransformation() else VisualTransformation.None,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password,
                     imeAction = ImeAction.Done
@@ -171,6 +173,7 @@ fun RegistrationScreen(
             // Register Button
             Button(
                 onClick = {
+                    viewModel.createAccount(userDetailsUi = state)
                     navController.navigate(Home)
                 },
                 modifier = Modifier

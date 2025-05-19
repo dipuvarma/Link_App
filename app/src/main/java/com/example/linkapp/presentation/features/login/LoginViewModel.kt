@@ -1,6 +1,7 @@
 package com.example.linkapp.presentation.features.login
 
 import androidx.lifecycle.ViewModel
+import com.example.linkapp.domain.model.UserDetailsUi
 import com.example.linkapp.presentation.features.registration.RegistrationState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,21 +14,25 @@ class LoginViewModel (): ViewModel(){
 
 
     fun updateEmail(email: String) {
-        _loginUiState.value = loginUiState.value.copy(
-            email = email
-        )
+        _loginUiState.update {
+            it.copy(userDetailsUi = UserDetailsUi(email = email))
+        }
     }
 
     fun updatePassword(password: String) {
-        _loginUiState.value = loginUiState.value.copy(
-            password = password
-        )
+        _loginUiState.update {
+            it.copy(
+                userDetailsUi = UserDetailsUi(password = password)
+            )
+        }
     }
 
     fun repeatPassword(repeatPassword: String) {
-        _loginUiState.value = loginUiState.value.copy(
-            repeatPassword = repeatPassword
-        )
+        _loginUiState.update {
+            it.copy(
+                repeatPassword = repeatPassword
+            )
+        }
     }
 
     fun togglePasswordVisibility() {

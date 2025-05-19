@@ -1,8 +1,9 @@
 package com.example.linkapp.presentation.features.registration
 
+import com.example.linkapp.domain.model.UserDetailsUi
+
 data class RegistrationState(
-    val name: String = "",
-    val email: String = "",
-    val password: String = "",
+    val userDetailsUi: UserDetailsUi = UserDetailsUi(),
     val isHidePassword: Boolean = false,
 )
+
