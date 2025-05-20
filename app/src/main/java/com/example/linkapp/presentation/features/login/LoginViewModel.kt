@@ -1,28 +1,44 @@
 package com.example.linkapp.presentation.features.login
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.linkapp.data.model.UserDetails
 import com.example.linkapp.domain.model.UserDetailsUi
+import com.example.linkapp.domain.repo.FirebaseAuthRepo
 import com.example.linkapp.presentation.features.registration.RegistrationState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class LoginViewModel (): ViewModel(){
+@HiltViewModel
+class LoginViewModel @Inject constructor(
+    private val firebaseAuthRepo: FirebaseAuthRepo,
+) : ViewModel() {
 
     private val _loginUiState = MutableStateFlow(LoginState())
     val loginUiState = _loginUiState.asStateFlow()
 
 
+    fun loginAccount(email: String, password: String) {
+        viewModelScope.launch {
+            firebaseAuthRepo.loginAccount(email, password)
+        }
+    }
+
     fun updateEmail(email: String) {
         _loginUiState.update {
-            it.copy(userDetailsUi = UserDetailsUi(email = email))
+            it.copy(userDetailsUi = it.userDetailsUi.copy(email = email))
         }
     }
 
     fun updatePassword(password: String) {
         _loginUiState.update {
             it.copy(
-                userDetailsUi = UserDetailsUi(password = password)
+                userDetailsUi = it.userDetailsUi.copy(password = password)
             )
         }
     }

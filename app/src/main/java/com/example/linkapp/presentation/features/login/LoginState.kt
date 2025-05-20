@@ -7,4 +7,6 @@ data class LoginState(
     val repeatPassword: String = "",
     val isHidePassword: Boolean = false,
     val isHideRepeatPassword: Boolean = false,
+    val error: String = "",
+    val isLoading: Boolean = false,
 )

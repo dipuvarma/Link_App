@@ -79,6 +79,7 @@ dependencies {
     implementation(libs.androidx.ui.text.google.fonts)
 
     //firebase
-    implementation(libs.firebase.auth)
-    implementation(libs.firebase.database)
+    implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
+    implementation("com.google.firebase:firebase-auth")
+
 }

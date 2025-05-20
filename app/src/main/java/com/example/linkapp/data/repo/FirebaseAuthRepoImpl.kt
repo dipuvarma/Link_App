@@ -1,30 +1,56 @@
 package com.example.linkapp.data.repo
 
 import android.util.Log
-import com.example.linkapp.data.mapper.toUserDetails
 import com.example.linkapp.domain.model.UserDetailsUi
 import com.example.linkapp.domain.repo.FirebaseAuthRepo
-import com.google.firebase.database.FirebaseDatabase
+import com.example.linkapp.utils.Response
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthRegistrar
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException
+import com.google.firebase.auth.FirebaseUser
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 
-class FirebaseAuthRepoImpl (firebaseDatabase: FirebaseDatabase) : FirebaseAuthRepo {
+class FirebaseAuthRepoImpl(val auth: FirebaseAuth) : FirebaseAuthRepo {
 
-    val myRef = firebaseDatabase.getReference("Users")
+    override suspend fun createAccount(email: String, password: String): Response<FirebaseUser> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val authResult = auth.createUserWithEmailAndPassword(email, password).await()
+                val user = authResult.user
+                if (user != null) {
+                    Response.Success(user)
+                } else {
+                    Response.Error("User creation failed: No user found")
+                }
+            } catch (e: FirebaseAuthWeakPasswordException) {
+                Response.Error("Password is too weak")
+            } catch (e: FirebaseAuthUserCollisionException) {
+                Response.Error("Email already in use")
+            } catch (e: FirebaseAuthInvalidCredentialsException) {
+                Response.Error("Invalid email format")
+            } catch (e: Exception) {
+                Response.Error(e.message ?: "Unknown error occurred")
+            }
+        }
+    }
 
-
-    override suspend fun createAccount(userDetailsUi: UserDetailsUi) {
-        val userDetails = userDetailsUi.toUserDetails()
-        try {
-            myRef.child(userDetails.id!!).setValue(userDetails).await()
-        } catch (e: Exception) {
-            Log.e("TAG", "createAccount: $e")
+    override suspend fun loginAccount(email: String, password: String) {
+        withContext(Dispatchers.IO) {
+            auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d("TAG", "loginAccount: Success")
+                } else {
+                    Log.d("TAG", "loginAccount: Failed")
+                }
+            }
         }
 
     }
 
-    override suspend fun loginAccount(userDetailsUi: UserDetailsUi) {
-        TODO("Not yet implemented")
-    }
 
     override suspend fun logoutAccount(userDetailsUi: UserDetailsUi) {
         TODO("Not yet implemented")

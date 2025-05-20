@@ -1,5 +1,6 @@
 package com.example.linkapp.presentation.features.registration
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,10 +10,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
@@ -22,6 +26,7 @@ import androidx.compose.material.icons.filled.RemoveRedEye
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -32,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -43,20 +49,24 @@ import androidx.navigation.NavHostController
 import com.example.linkapp.presentation.component.FormLabel
 import com.example.linkapp.presentation.navigation.Home
 import com.example.linkapp.presentation.navigation.Login
+import com.example.linkapp.utils.Response
+import com.google.firebase.auth.FirebaseUser
 
 @Composable
 fun RegistrationScreen(
     viewModel: RegistrationViewModel,
     navController: NavHostController,
 ) {
+    val context = LocalContext.current
     val stateUi by viewModel.registrationUiState.collectAsState()
 
-    val state = stateUi.userDetailsUi
+    val userDetail = stateUi.userDetailsUi
 
     val nameFocusRequester = remember { FocusRequester() }
     val emailFocusRequester = remember { FocusRequester() }
     val passwordFocusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
+
 
     Box(
         modifier = Modifier
@@ -67,7 +77,8 @@ fun RegistrationScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 16.dp)
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.Center
         ) {
             // Header
@@ -91,8 +102,8 @@ fun RegistrationScreen(
             FormLabel("Your Name")
             Spacer(modifier = Modifier.height(4.dp))
             OutlinedTextField(
-                value = state.name,
-                onValueChange = viewModel::updateName,
+                value = userDetail.name,
+                onValueChange = { viewModel.onEvent(RegistrationEvent.UpdateName(it)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .focusRequester(nameFocusRequester),
@@ -113,8 +124,8 @@ fun RegistrationScreen(
             FormLabel("Your email")
             Spacer(modifier = Modifier.height(4.dp))
             OutlinedTextField(
-                value = state.email,
-                onValueChange = viewModel::updateEmail,
+                value = userDetail.email,
+                onValueChange = { viewModel.onEvent(RegistrationEvent.UpdateEmail(it)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .focusRequester(emailFocusRequester),
@@ -136,8 +147,8 @@ fun RegistrationScreen(
             FormLabel("Password")
             Spacer(modifier = Modifier.height(4.dp))
             OutlinedTextField(
-                value = state.password,
-                onValueChange = viewModel::updatePassword,
+                value = userDetail.password,
+                onValueChange = { viewModel.onEvent(RegistrationEvent.UpdatePassword(it)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .focusRequester(passwordFocusRequester),
@@ -146,7 +157,7 @@ fun RegistrationScreen(
                     Icon(Icons.Default.Lock, contentDescription = "Password icon")
                 },
                 trailingIcon = {
-                    if (state.password.isNotEmpty()) {
+                    if (userDetail.password.isNotEmpty()) {
                         IconButton(onClick = viewModel::togglePasswordVisibility) {
                             Icon(
                                 imageVector = if (stateUi.isHidePassword)
@@ -173,8 +184,16 @@ fun RegistrationScreen(
             // Register Button
             Button(
                 onClick = {
-                    viewModel.createAccount(userDetailsUi = state)
-                    navController.navigate(Home)
+                    if (!stateUi.isLoading) {
+                        viewModel.createAccount(
+                            email = userDetail.email,
+                            password = userDetail.password
+                        )
+                        navController.navigate(Home)
+                        Toast.makeText(context, stateUi.success, Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(context, stateUi.error, Toast.LENGTH_SHORT).show()
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -186,7 +205,14 @@ fun RegistrationScreen(
                 ),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp)
             ) {
-                Text("Register")
+                if (stateUi.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                } else {
+                    Text("Register")
+                }
             }
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -216,7 +242,7 @@ fun RegistrationScreen(
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary.copy(alpha = .2f),
                     contentColor = MaterialTheme.colorScheme.primary
-                )
+                ),
             ) {
                 Text("Login")
             }

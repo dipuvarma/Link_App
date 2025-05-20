@@ -10,9 +10,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
@@ -55,7 +57,7 @@ fun LoginScreen(
 ) {
     val stateUi by viewModel.loginUiState.collectAsState()
 
-    val state = stateUi.userDetailsUi
+    val userDetail = stateUi.userDetailsUi
 
     val emailFocusRequester = remember { FocusRequester() }
     val passwordFocusRequester = remember { FocusRequester() }
@@ -71,7 +73,8 @@ fun LoginScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 16.dp)
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.Center
         ) {
             // Header
@@ -95,7 +98,7 @@ fun LoginScreen(
             FormLabel("Your email")
             Spacer(modifier = Modifier.height(4.dp))
             OutlinedTextField(
-                value = state.email,
+                value = userDetail.email,
                 onValueChange = viewModel::updateEmail,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -118,7 +121,7 @@ fun LoginScreen(
             FormLabel("Password")
             Spacer(modifier = Modifier.height(4.dp))
             OutlinedTextField(
-                value = state.password,
+                value = userDetail.password,
                 onValueChange = viewModel::updatePassword,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -128,7 +131,7 @@ fun LoginScreen(
                     Icon(Icons.Default.Lock, contentDescription = "Password icon")
                 },
                 trailingIcon = {
-                    if (state.password.isNotEmpty()) {
+                    if (userDetail.password.isNotEmpty()) {
                         IconButton(onClick = viewModel::togglePasswordVisibility) {
                             Icon(
                                 imageVector = if (stateUi.isHidePassword)
@@ -188,9 +191,13 @@ fun LoginScreen(
             )
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Register Button
+            // Login Button
             Button(
                 onClick = {
+                    viewModel.loginAccount(
+                        email = userDetail.email,
+                        password = userDetail.password
+                    )
                     navController.navigate(Home)
                 },
                 modifier = Modifier
@@ -208,7 +215,7 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Login Prompt
+            // Register
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
@@ -222,6 +229,7 @@ fun LoginScreen(
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))
+
             Button(
                 onClick = {
                     navController.navigate(Registration)

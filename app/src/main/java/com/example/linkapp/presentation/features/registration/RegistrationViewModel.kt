@@ -1,11 +1,12 @@
 package com.example.linkapp.presentation.features.registration
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.linkapp.data.model.UserDetails
-import com.example.linkapp.data.remote.firebase.FirebaseAuth
 import com.example.linkapp.domain.model.UserDetailsUi
 import com.example.linkapp.domain.repo.FirebaseAuthRepo
+import com.example.linkapp.utils.Response
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,27 +22,45 @@ class RegistrationViewModel @Inject constructor(
     private val _registrationUiState = MutableStateFlow(RegistrationState())
     val registrationUiState = _registrationUiState.asStateFlow()
 
+    fun onEvent(event: RegistrationEvent) {
+        when (event) {
+            is RegistrationEvent.UpdateEmail -> {
+                _registrationUiState.update {
+                    it.copy(userDetailsUi = it.userDetailsUi.copy(email = event.email))
+                }
+            }
 
-    fun createAccount(userDetailsUi: UserDetailsUi) {
+            is RegistrationEvent.UpdateName -> {
+                _registrationUiState.update {
+                    it.copy(userDetailsUi = it.userDetailsUi.copy(name = event.name))
+                }
+
+            }
+
+            is RegistrationEvent.UpdatePassword -> {
+                _registrationUiState.update {
+                    it.copy(userDetailsUi = it.userDetailsUi.copy(password = event.password))
+                }
+            }
+        }
+    }
+
+    fun createAccount(email: String, password: String) {
         viewModelScope.launch {
-            firebaseAuthRepo.createAccount(userDetailsUi)
-        }
-    }
+            _registrationUiState.update { it.copy(isLoading = true) }
+            val response = firebaseAuthRepo.createAccount(email, password)
+            _registrationUiState.update { it.copy(isLoading = false) }
+            when (response) {
+                is Response.Error -> _registrationUiState.update {
+                    it.copy(
+                        error = response.error
+                    )
+                }
 
-    fun updateName(name: String) {
-        _registrationUiState.update {
-            it.copy(userDetailsUi = it.userDetailsUi.copy(name =name)) }
-    }
-
-    fun updateEmail(email: String) {
-        _registrationUiState.update {
-            it.copy(userDetailsUi = it.userDetailsUi.copy(email =email))
-        }
-    }
-
-    fun updatePassword(password: String) {
-        _registrationUiState.update {
-            it.copy(userDetailsUi = it.userDetailsUi.copy(password =password))
+                is Response.Success<*> -> {
+                    _registrationUiState.update { it.copy(success = response.data.toString()) }
+                }
+            }
         }
     }
 
