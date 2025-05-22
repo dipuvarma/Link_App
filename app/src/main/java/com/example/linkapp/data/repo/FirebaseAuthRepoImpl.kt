@@ -26,12 +26,8 @@ class FirebaseAuthRepoImpl(val auth: FirebaseAuth) : FirebaseAuthRepo {
                 } else {
                     Response.Error("User creation failed: No user found")
                 }
-            } catch (e: FirebaseAuthWeakPasswordException) {
-                Response.Error("Password is too weak")
             } catch (e: FirebaseAuthUserCollisionException) {
-                Response.Error("Email already in use")
-            } catch (e: FirebaseAuthInvalidCredentialsException) {
-                Response.Error("Invalid email format")
+                Response.Error(e.message ?: "Email already in use")
             } catch (e: Exception) {
                 Response.Error(e.message ?: "Unknown error occurred")
             }
@@ -48,12 +44,15 @@ class FirebaseAuthRepoImpl(val auth: FirebaseAuth) : FirebaseAuthRepo {
                 }
             }
         }
-
     }
 
-
-    override suspend fun logoutAccount(userDetailsUi: UserDetailsUi) {
+    override suspend fun logoutAccount(email: String, password: String) {
         TODO("Not yet implemented")
     }
+
+    override suspend fun forgetAccount(email: String, password: String) {
+        TODO("Not yet implemented")
+    }
+
 
 }

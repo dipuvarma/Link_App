@@ -1,4 +1,4 @@
-package com.example.linkapp.presentation.features.registration
+package com.example.linkapp.presentation.screens.auth.registration
 
 sealed class RegistrationEvent {
     data class UpdateName(val name: String) : RegistrationEvent()

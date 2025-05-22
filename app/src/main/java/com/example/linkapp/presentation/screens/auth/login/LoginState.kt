@@ -1,4 +1,4 @@
-package com.example.linkapp.presentation.features.login
+package com.example.linkapp.presentation.screens.auth.login
 
 import com.example.linkapp.domain.model.UserDetailsUi
 

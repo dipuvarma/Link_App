@@ -1,12 +1,8 @@
-package com.example.linkapp.presentation.features.login
+package com.example.linkapp.presentation.screens.auth.login
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.linkapp.data.model.UserDetails
-import com.example.linkapp.domain.model.UserDetailsUi
 import com.example.linkapp.domain.repo.FirebaseAuthRepo
-import com.example.linkapp.presentation.features.registration.RegistrationState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

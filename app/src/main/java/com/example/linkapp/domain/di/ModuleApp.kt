@@ -2,11 +2,9 @@ package com.example.linkapp.domain.di
 
 import com.example.linkapp.data.repo.FirebaseAuthRepoImpl
 import com.example.linkapp.domain.repo.FirebaseAuthRepo
-import com.example.linkapp.presentation.features.login.LoginViewModel
-import com.example.linkapp.presentation.features.registration.RegistrationViewModel
-import com.google.firebase.Firebase
+import com.example.linkapp.presentation.screens.auth.login.LoginViewModel
+import com.example.linkapp.presentation.screens.auth.registration.RegistrationViewModel
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.auth
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

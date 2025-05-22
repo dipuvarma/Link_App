@@ -9,5 +9,6 @@ import kotlinx.coroutines.flow.Flow
 interface FirebaseAuthRepo {
     suspend fun createAccount( email: String, password: String ): Response<FirebaseUser>
     suspend fun loginAccount(email: String, password: String )
-    suspend fun logoutAccount(userDetailsUi: UserDetailsUi)
+    suspend fun logoutAccount(email: String, password: String)
+    suspend fun forgetAccount(email: String, password: String)
 }

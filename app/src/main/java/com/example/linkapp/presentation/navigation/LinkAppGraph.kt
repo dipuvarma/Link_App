@@ -5,11 +5,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.linkapp.presentation.features.home.HomeScreen
-import com.example.linkapp.presentation.features.login.LoginScreen
-import com.example.linkapp.presentation.features.login.LoginViewModel
-import com.example.linkapp.presentation.features.registration.RegistrationScreen
-import com.example.linkapp.presentation.features.registration.RegistrationViewModel
+import com.example.linkapp.presentation.screens.auth.login.LoginScreen
+import com.example.linkapp.presentation.screens.auth.registration.RegistrationScreen
 
 @Composable
 fun LinkAppGraph() {
@@ -28,9 +25,6 @@ fun LinkAppGraph() {
                 viewModel = hiltViewModel(),
                 navController = navController
             )
-        }
-        composable<Home> {
-            HomeScreen()
         }
     }
 
